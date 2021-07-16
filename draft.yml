@@ -1,0 +1,52 @@
+models:
+  House:
+    name: string
+    slug: string unique
+    address: string
+    relationships:
+      hasMany: Huesped
+  Huesped:
+    name: string
+    slug: string unique
+    cam: string
+    house_id: id
+    relationships:
+      hasMany: Bin
+  Bin:
+    code: int
+    huesped_id: id
+    sku_id: id
+    dailyDose: float:5,2
+  Presentation:
+    name: string
+    slug: string unique
+    relationships:
+      hasMany: Sku
+  Unit:
+    name: string
+    slug: string unique
+    relationships:
+      hasMany: Sku
+  Category:
+    name: string
+    slug: string unique
+    relationships:
+      hasMany: Sku
+  Image:
+    url: string
+    imageable_id: string
+    imageable_type: string
+  Sku:
+    name: string
+    slug: string unique
+    concentration: string
+    unitQty: integer
+    skuDate: date
+    unitInput: float:5,2
+    unitOutput: float:5,2
+    presentation_id: id
+    unit_id: id
+    user_id: id
+    category_id: id
+    relationships:
+      hasMany: Bin
