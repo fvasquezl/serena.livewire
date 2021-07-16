@@ -6,6 +6,8 @@
     </x-slot>
 
     <div class="py-12">
+        <h1 class="text-gray-800">text</h1>
+        <h1 class="text-teal-200">holaa</h1>
         <h1 class="text-teal-200">holaa</h1>
 
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
