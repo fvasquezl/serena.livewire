@@ -81,7 +81,7 @@
                             @if ($permissions->count())
                                 @foreach ($permissions as $permission)
                                     <tr
-                                        class="hover:bg-sky-700 hover:text-white hover:font-semibold font-normal text-gray-500">
+                                        class="hover:bg-sky-700 hover:text-white hover:font-normal font-normal text-gray-500">
                                         <td class="px-6 py-2 whitespace-nowrap text-center">
                                             {{ $permission->id }}
                                         </td>

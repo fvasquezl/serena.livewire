@@ -168,6 +168,8 @@ class PermissionController extends Component
      */
     public function render()
     {
+        $this->authorize('view', new Permission);
+
         $permissions = Permission::where('name', 'LIKE', "%{$this->search}%")
             ->orWhere('display_name', 'LIKE', "%{$this->search}%")
             ->orderBy($this->sort, $this->direction)
