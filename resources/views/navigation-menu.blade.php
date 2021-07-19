@@ -20,11 +20,11 @@
                         <x-slot name="name">Admin</x-slot>
                         <x-slot name="children">
                             @can('view', new App\Models\User())
-                                <a href="#">Users</a>
+                                <a href="{{ route('admin.users') }}">Users</a>
                             @endcan
                             <span class="separator"></span>
                             @can('view', new \Spatie\Permission\Models\Role())
-                                <a href="#">Roles</a>
+                                <a href="{{ route('admin.roles') }}">Roles</a>
                             @endcan
                             @can('view', new \Spatie\Permission\Models\Permission())
                                 <a href="{{ route('admin.permissions') }}">Permissions</a>
@@ -174,14 +174,18 @@
             </x-jet-responsive-nav-link>
 
             <x-responsive-nav-link-parent :href="'#'" :active="request()->routeIs('padron.*')">
-                <x-slot name="name">Padrón</x-slot>
+                <x-slot name="name">Admin</x-slot>
                 <x-slot name="children">
-                    <a href="#">Buscador</a>
+                    @can('view', new App\Models\User())
+                        <a href="{{ route('admin.users') }}">Users</a>
+                    @endcan
                     <span class="separator"></span>
-                    <a href="#">Centros de votacion</a>
-                    <a href="#">Juntas</a>
-                    <span class="separator"></span>
-                    <a href="#">Cartografia</a>
+                    @can('view', new \Spatie\Permission\Models\Role())
+                        <a href="{{ route('admin.roles') }}">Roles</a>
+                    @endcan
+                    @can('view', new \Spatie\Permission\Models\Permission())
+                        <a href="{{ route('admin.permissions') }}">Permissions</a>
+                    @endcan
                 </x-slot>
             </x-responsive-nav-link-parent>
         </div>
