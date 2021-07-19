@@ -2,6 +2,9 @@
 
 namespace App\Http\Livewire\Admin\Permissions;
 
+//use App\Traits\AuthorizesRoleOrPermission;
+
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -10,7 +13,8 @@ use Spatie\Permission\Models\Permission;
 class PermissionController extends Component
 {
     use WithPagination;
-
+    // use AuthorizesRoleOrPermission;
+    use AuthorizesRequests;
 
     public $permission;
     public $modalFormVisible = false;
@@ -35,10 +39,10 @@ class PermissionController extends Component
 
     protected $listeners = [
         'render',
-        // 'delete',
-        // 'createModal' => 'createShowModal',
         'updateModal' => 'updateShowModal'
     ];
+
+
 
 
 
@@ -61,24 +65,13 @@ class PermissionController extends Component
      *
      * @return void
      */
-    public function mount()
+    public function mount(Permission $permission)
     {   //Resets the pagination after reloading the page
+        $this->permission = $permission;
         $this->resetPage();
     }
 
-    // /**
-    //  * the create function
-    //  *
-    //  * @return void
-    //  */
-    // public function create()
-    // {
-    //     $this->validate();
-    //     Permission::create($this->modelData());
-    //     $this->modalFormVisible = false;
-    //     $this->resetVars();
-    //     $this->emit('alert', 'The permission was create successfully');
-    // }
+
 
     /**
      * The read function
@@ -99,38 +92,16 @@ class PermissionController extends Component
      */
     function update()
     {
+        $this->authorize('update', $this->permission);
+
         $this->validate();
+
         Permission::find($this->modelId)->update($this->modelData());
+
         $this->modalFormVisible = false;
 
         $this->emit('alert', 'The permission was updated successfully');
     }
-
-    // /**
-    //  * the delete function
-    //  *
-    //  * @return void
-    //  */
-    // function delete(Permission $permission)
-    // {
-
-    //     $permission->delete();
-    //     $this->resetPage();
-    // }
-
-
-    // /**
-    //  * Shows the form modal
-    //  * of the create function
-    //  *
-    //  * @return void
-    //  */
-    // public function createShowModal()
-    // {
-    //     $this->resetValidation();
-    //     $this->resetVars();
-    //     $this->modalFormVisible = true;
-    // }
 
     /**
      * Show s the form modal

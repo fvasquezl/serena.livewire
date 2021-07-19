@@ -71,6 +71,7 @@
                                         <i class="fas fa-sort float-right"></i>
                                     @endif
                                 </th>
+
                                 <th scope="col" class="px-6 py-3 text-center ">
                                     Actions
                                 </th>
@@ -90,13 +91,17 @@
                                         <td class="px-6 py-2 whitespace-nowrap text-base">
                                             {{ $permission->display_name }}
                                         </td>
-                                        <td class="px-6 py-2 whitespace-nowrap text-center">
-                                            <x-jet-button
-                                                wire:click="$emitTo('admin.permissions.permission-controller', 'updateModal',{{ $permission->id }} )"
-                                                class="bg-blue-500 hover:bg-blue-700  text-base font-medium">
-                                                <i class="fas fa-edit"></i>
-                                            </x-jet-button>
-                                        </td>
+                                        @can('update', $permission)
+                                            <td class="px-6 py-2 whitespace-nowrap text-center">
+
+                                                <x-jet-button
+                                                    wire:click="$emitTo('admin.permissions.permission-controller', 'updateModal',{{ $permission->id }} )"
+                                                    class="bg-blue-500 hover:bg-blue-700  text-base font-medium">
+                                                    <i class="fas fa-edit"></i>
+                                                </x-jet-button>
+
+                                            </td>
+                                        @endcan
                                     </tr>
                                 @endforeach
                             @else
