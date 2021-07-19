@@ -26,6 +26,21 @@ class PermissionController extends Component
     public $show = '10';
 
 
+    protected $queryString = [
+        'show' => ['except' => '10'],
+        'sort' => ['except' => 'id'],
+        'direction' => ['except' => 'desc'],
+        'search' => ['except' => ''],
+    ];
+
+    protected $listeners = [
+        'render',
+        // 'delete',
+        // 'createModal' => 'createShowModal',
+        'updateModal' => 'updateShowModal'
+    ];
+
+
 
     /**
      * rules
@@ -35,13 +50,8 @@ class PermissionController extends Component
     public function rules()
     {
         $rules =  [
-            'name' => ['required', Rule::unique('permissions', 'display_name')->ignore($this->modelId)],
             'display_name' => ['required'],
         ];
-
-        if ($this->password || $this->modelId == null) {
-            $rules['password'] = ['confirmed', 'min:6'];
-        }
 
         return $rules;
     }
@@ -56,19 +66,19 @@ class PermissionController extends Component
         $this->resetPage();
     }
 
-    /**
-     * the create function
-     *
-     * @return void
-     */
-    public function create()
-    {
-        $this->validate();
-        Permission::create($this->modelData());
-        $this->modalFormVisible = false;
-        $this->resetVars();
-        $this->emit('alert', 'The permission was create successfully');
-    }
+    // /**
+    //  * the create function
+    //  *
+    //  * @return void
+    //  */
+    // public function create()
+    // {
+    //     $this->validate();
+    //     Permission::create($this->modelData());
+    //     $this->modalFormVisible = false;
+    //     $this->resetVars();
+    //     $this->emit('alert', 'The permission was create successfully');
+    // }
 
     /**
      * The read function
@@ -96,31 +106,31 @@ class PermissionController extends Component
         $this->emit('alert', 'The permission was updated successfully');
     }
 
-    /**
-     * the delete function
-     *
-     * @return void
-     */
-    function delete(Permission $permission)
-    {
+    // /**
+    //  * the delete function
+    //  *
+    //  * @return void
+    //  */
+    // function delete(Permission $permission)
+    // {
 
-        $permission->delete();
-        $this->resetPage();
-    }
+    //     $permission->delete();
+    //     $this->resetPage();
+    // }
 
 
-    /**
-     * Shows the form modal
-     * of the create function
-     *
-     * @return void
-     */
-    public function createShowModal()
-    {
-        $this->resetValidation();
-        $this->resetVars();
-        $this->modalFormVisible = true;
-    }
+    // /**
+    //  * Shows the form modal
+    //  * of the create function
+    //  *
+    //  * @return void
+    //  */
+    // public function createShowModal()
+    // {
+    //     $this->resetValidation();
+    //     $this->resetVars();
+    //     $this->modalFormVisible = true;
+    // }
 
     /**
      * Show s the form modal
@@ -147,7 +157,7 @@ class PermissionController extends Component
     {
         $data = Permission::find($this->modelId);
         $this->name = $data->name;
-        $this->email = $data->email;
+        $this->display_name = $data->display_name;
     }
 
     /**
@@ -160,13 +170,8 @@ class PermissionController extends Component
     {
         $permission =  [
             'name' => $this->name,
-            'display_name' => $this->email,
+            'display_name' => $this->display_name,
         ];
-
-        if ($this->password != null) {
-            $permission['password'] = $this->password;
-        }
-
         return $permission;
     }
 
@@ -180,9 +185,7 @@ class PermissionController extends Component
     {
         $this->modelId = null;
         $this->name = null;
-        $this->email = null;
-        $this->password = null;
-        $this->password_confirmation = null;
+        $this->display_name = null;
     }
 
 
