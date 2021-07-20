@@ -54,6 +54,7 @@ class PermissionController extends Component
     public function rules()
     {
         $rules =  [
+            'name' => ['required'],
             'display_name' => ['required'],
         ];
 

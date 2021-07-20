@@ -5,27 +5,27 @@ namespace App\Http\Livewire\Admin\Roles;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class RoleController extends Component
 {
     use WithPagination;
-    // use AuthorizesRoleOrRole;
-    use AuthorizesRequests;
+    //  protected $paginationTheme = 'bootstrap';
 
     public $role;
     public $modalFormVisible = false;
     public $modelId;
     public $name;
     public $display_name;
+    public $permissions = [];
 
     //Table
     public $readyToLoad = false;
     public $search = '';
-    public $direction = 'desc';
+    public $direction = 'asc';
     public $sort = 'id';
     public $show = '10';
-
 
     protected $queryString = [
         'show' => ['except' => '10'],
@@ -36,12 +36,10 @@ class RoleController extends Component
 
     protected $listeners = [
         'render',
+        'delete',
+        'createModal' => 'createShowModal',
         'updateModal' => 'updateShowModal'
     ];
-
-
-
-
 
     /**
      * rules
@@ -51,8 +49,10 @@ class RoleController extends Component
     public function rules()
     {
         $rules =  [
+            'name' => 'required',
             'display_name' => ['required'],
         ];
+
 
         return $rules;
     }
@@ -62,13 +62,24 @@ class RoleController extends Component
      *
      * @return void
      */
-    public function mount(Role $role)
+    public function mount()
     {   //Resets the pagination after reloading the page
-        $this->role = $role;
         $this->resetPage();
     }
 
-
+    /**
+     * the create function
+     *
+     * @return void
+     */
+    public function create()
+    {
+        $this->validate();
+        Role::create($this->modelData());
+        $this->modalFormVisible = false;
+        $this->resetVars();
+        $this->emit('alert', 'The user was create successfully');
+    }
 
     /**
      * The read function
@@ -89,15 +100,37 @@ class RoleController extends Component
      */
     function update()
     {
-        $this->authorize('update', $this->role);
-
         $this->validate();
-
         Role::find($this->modelId)->update($this->modelData());
-
         $this->modalFormVisible = false;
 
-        $this->emit('alert', 'The Role was updated successfully');
+        $this->emit('alert', 'The role was updated successfully');
+    }
+
+    /**
+     * the delete function
+     *
+     * @return void
+     */
+    function delete(Role $role)
+    {
+
+        $role->delete();
+        $this->resetPage();
+    }
+
+
+    /**
+     * Shows the form modal
+     * of the create function
+     *
+     * @return void
+     */
+    public function createShowModal()
+    {
+        $this->resetValidation();
+        $this->resetVars();
+        $this->modalFormVisible = true;
     }
 
     /**
@@ -108,6 +141,7 @@ class RoleController extends Component
      */
     public function updateShowModal($id)
     {
+
         $this->resetValidation();
         $this->resetVars();
         $this->modelId = $id;
@@ -126,6 +160,7 @@ class RoleController extends Component
         $data = Role::find($this->modelId);
         $this->name = $data->name;
         $this->display_name = $data->display_name;
+        $this->permissions = Permission::pluck('name', 'id');
     }
 
     /**
@@ -165,8 +200,6 @@ class RoleController extends Component
      */
     public function render()
     {
-        $this->authorize('view', new Role);
-
         $roles = Role::where('name', 'LIKE', "%{$this->search}%")
             ->orWhere('display_name', 'LIKE', "%{$this->search}%")
             ->orderBy($this->sort, $this->direction)
@@ -174,7 +207,6 @@ class RoleController extends Component
 
         return view('livewire.admin.roles.index', compact('roles'));
     }
-
 
     public function order($sort)
     {

@@ -4,13 +4,14 @@
             <h2 class=" font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('Admin/Roles') }}
             </h2>
-            <div class="mr-2">
-                <x-jet-button wire:click="$emitTo('admin.roles.role-controller', 'createModal')"
-                    class="bg-blue-500 hover:bg-blue-700">
-                    <i class="fas fa-plus"></i>&nbsp; {{ __('Create role') }}
-                </x-jet-button>
-            </div>
-
+            @can('create', $roles->first())
+                <div class="mr-2">
+                    <x-jet-button wire:click="$emitTo('admin.roles.role-controller', 'createModal')"
+                        class="bg-blue-500 hover:bg-blue-700">
+                        <i class="fas fa-plus"></i>&nbsp; {{ __('Create roles') }}
+                    </x-jet-button>
+                </div>
+            @endcan
         </div>
     </div>
 
@@ -38,9 +39,9 @@
                     </div>
 
                     <table class="min-w-full divide-y divide-gray-300">
-                        <thead class="bg-indigo-600 font-normal text-white  uppercase tracking-wider">
+                        <thead class="bg-teal-600 font-medium text-sm text-white  uppercase tracking-wider">
                             <tr>
-                                <th scope="col" class="px-6 py-3 text-center" wire:click="order('id')">
+                                <th scope="col" class="px-6 py-2 text-center" wire:click="order('id')">
                                     Id
                                     @if ($sort == 'id')
                                         @if ($direction == 'asc')
@@ -52,8 +53,8 @@
                                         <i class="fas fa-sort float-right"></i>
                                     @endif
                                 </th>
-                                <th scope="col" class="px-6 py-3 text-left text-base " wire:click="order('name')">
-                                    Iindex Name
+                                <th scope="col" class="px-6 py-2 text-left" wire:click="order('name')">
+                                    Identifier
                                     @if ($sort == 'name')
                                         @if ($direction == 'asc')
                                             <i class="fas fa-sort-alpha-up-alt float-right mt-1"></i>
@@ -65,8 +66,7 @@
                                     @endif
 
                                 </th>
-                                <th scope="col" class="px-6 py-3 text-left text-base "
-                                    wire:click="order('display_name')">
+                                <th scope="col" class="px-6 py-2 text-left" wire:click="order('display_name')">
                                     Name
                                     @if ($sort == 'display_name')
                                         @if ($direction == 'asc')
@@ -78,6 +78,20 @@
                                         <i class="fas fa-sort float-right"></i>
                                     @endif
                                 </th>
+
+                                <th scope="col" class="px-6 py-2 text-left" wire:click="order('permissions')">
+                                    Name
+                                    {{-- @if ($sort == 'display_name')
+                                        @if ($direction == 'asc')
+                                            <i class="fas fa-sort-alpha-up-alt float-right mt-1"></i>
+                                        @else
+                                            <i class="fas fa-sort-alpha-down-alt float-right mt-1"></i>
+                                        @endif
+                                    @else
+                                        <i class="fas fa-sort float-right"></i>
+                                    @endif --}}
+                                </th>
+
 
                                 <th scope="col" class="px-6 py-3 text-center ">
                                     Actions
@@ -98,15 +112,25 @@
                                         <td class="px-6 py-2 whitespace-nowrap text-base">
                                             {{ $role->display_name }}
                                         </td>
+                                        <td>{{ count($role->permissions) ? $role->permissions->pluck('display_name')->implode(', ') : 'No permissions Added' }}
+                                        </td>
+
                                         @can('update', $role)
-                                            <td class="px-6 py-2 whitespace-nowrap text-center">
+                                            <td class="px-6 py-2 whitespace-nowrap text-left">
 
                                                 <x-jet-button
                                                     wire:click="$emitTo('admin.roles.role-controller', 'updateModal',{{ $role->id }} )"
                                                     class="bg-blue-500 hover:bg-blue-700  text-base font-medium">
                                                     <i class="fas fa-edit"></i>
                                                 </x-jet-button>
-
+                                                @can('delete', $role)
+                                                    @if ($role->id !== 1)
+                                                        <x-jet-button wire:click="$emit('deleteUser',{{ $role->id }})"
+                                                            class="bg-red-500 hover:bg-red-700  text-base font-medium">
+                                                            <i class="fas fa-trash"></i>
+                                                        </x-jet-button>
+                                                    @endif
+                                                @endcan
                                             </td>
                                         @endcan
                                     </tr>
@@ -149,6 +173,22 @@
                     wire:model.debounce.80ms="display_name" />
                 <x-jet-input-error for="display_name" />
             </div>
+
+            @foreach ($permissions as $permission)
+                <ul class="list-unstyled">
+                    @foreach ($roles as $role)
+                        <li>
+                            <label>
+                                <input name="roles[]" type="checkbox" value="{{ $role->id }}"
+                                    {{ $user->roles->contains($role->id) ? 'checked' : '' }}>
+                                {{ $role->name }} <br>
+                                <small
+                                    class="text-muted">{{ $role->permissions->pluck('name')->implode(', ') }}</small>
+                            </label>
+                        </li>
+                    @endforeach
+                </ul>
+            @endforeach
 
         </x-slot>
 
